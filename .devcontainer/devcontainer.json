@@ -1,0 +1,33 @@
+{
+  "name": "nx work-space development",
+  "context": "..",
+  "dockerFile": "Dockerfile",
+  "settings": {
+    "terminal.integrated.shell.linux": null,
+    "editor.tabSize": 2
+  },
+  "extensions": [
+    "eamodio.gitlens",
+    "mutantdino.resourcemonitor",
+    "GitHub.vscode-pull-request-github",
+    "esbenp.prettier-vscode",
+    "HookyQR.beautify",
+    "CoenraadS.bracket-pair-colorizer",
+    "softwaredotcom.swdc-vscode",
+    "streetsidesoftware.code-spell-checker",
+    "oderwat.indent-rainbow",
+    "ms-vscode.vscode-typescript-tslint-plugin",
+    "dbaeumer.vscode-eslint",
+    "Angular.ng-template",
+    "joelday.docthis",
+    "quicktype.quicktype",
+    "formulahendry.auto-rename-tag",
+    "formulahendry.auto-close-tag",
+    "nrwl.angular-console"
+  ],
+  "forwardPorts": [8080, 4200, 3333, 3000],
+  "mounts": [
+    "source=try-node-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
+  ],
+  "containerEnv": {}
+}
