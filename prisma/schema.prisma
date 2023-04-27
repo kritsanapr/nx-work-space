@@ -1,11 +1,1301 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["orderByNulls"]
+  binaryTargets   = ["native", "linux-musl", "darwin-arm64", "linux-arm64-openssl-1.1.x", "debian-openssl-1.1.x"]
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "cockroachdb"
   url      = env("DATABASE_URL")
+}
+
+model BloodGroup {
+  BloodGroupKey BigInt   @id @default(autoincrement())
+  Code          String   @unique(map: "Code_UNIQUE")
+  Name          String
+  ENName        String?
+  Note          String?
+  IsDisabled    Boolean
+  CreatorKey    BigInt
+  CreateDT      DateTime @db.Timestamp(0)
+  UpdaterKey    BigInt
+  UpdateDT      DateTime @db.Timestamp(0)
+  User          User[]   @ignore
+}
+
+model CheckList {
+  CheckListKey     BigInt             @id @default(autoincrement())
+  Code             String             @unique(map: "Code_UNIQUE")
+  Name             String
+  ENName           String?
+  Note             String?
+  IsDisabled       Boolean
+  CreatorKey       BigInt
+  CreateDT         DateTime           @db.Timestamp(0)
+  UpdaterKey       BigInt
+  UpdateDT         DateTime           @db.Timestamp(0)
+  ProjCheckDetail  ProjCheckDetail[]
+  ProjectChecklist ProjectChecklist[]
+}
+
+model ConfigSection {
+  ConfigSectionKey              BigInt         @id
+  Name                          String         @unique(map: "Name_UNIQUE")
+  configurationConfigurationKey BigInt?
+  Configuration                 Configuration? @relation(fields: [configurationConfigurationKey], references: [ConfigurationKey])
+}
+
+model Configuration {
+  ConfigurationKey BigInt          @id
+  ConfigSectionKey BigInt
+  OrderNo          BigInt
+  Name             String
+  DataType         BigInt
+  DefaultValue     String?
+  Value            String?
+  ConfigSection    ConfigSection[]
+}
+
+model Contractor {
+  ContractorKey BigInt   @id @default(autoincrement())
+  Code          String   @unique(map: "Code_UNIQUE")
+  Name          String
+  ENName        String?
+  Note          String?
+  IsDisabled    Boolean
+  CreatorKey    BigInt
+  CreateDT      DateTime @db.Timestamp(0)
+  UpdaterKey    BigInt
+  UpdateDT      DateTime @db.Timestamp(0)
+}
+
+model Country {
+  CountryKey BigInt   @id @default(autoincrement())
+  Code       String   @unique(map: "Code_UNIQUE")
+  Name       String
+  ENName     String?
+  Note       String?
+  IsDisabled Boolean
+  CreatorKey BigInt
+  CreateDT   DateTime @db.Timestamp(0)
+  UpdaterKey BigInt
+  UpdateDT   DateTime @db.Timestamp(0)
+}
+
+model Department {
+  DepartmentKey      BigInt            @id @default(autoincrement())
+  Code               String            @unique(map: "Code_UNIQUE")
+  Name               String
+  ENName             String?
+  Note               String?
+  IsDisabled         Boolean
+  CreatorKey         BigInt
+  CreateDT           DateTime          @db.Timestamp(0)
+  UpdaterKey         BigInt
+  UpdateDT           DateTime          @db.Timestamp(0)
+  DepartmentGroupKey BigInt
+  DepartmentTypeKey  BigInt
+  Project            Project[]
+  ProjectRevision    ProjectRevision[]
+  User               User[]            @ignore
+
+  @@index([DepartmentGroupKey], map: "iDepartmentGroupKey")
+}
+
+model DepartmentGroup {
+  DepartmentGroupKey BigInt   @id @unique @default(autoincrement())
+  Code               String   @unique(map: "Code_UNIQUE")
+  Name               String
+  ENName             String?
+  Note               String?
+  IsDisabled         Boolean
+  CreatorKey         BigInt
+  CreateDT           DateTime @db.Timestamp(0)
+  UpdaterKey         BigInt
+  UpdateDT           DateTime @db.Timestamp(0)
+}
+
+model District {
+  DistrictKey     BigInt            @id @default(autoincrement())
+  ProvinceKey     BigInt
+  Code            String
+  Name            String
+  ENName          String
+  Note            String?
+  IsSub           Boolean
+  IsDisabled      Boolean
+  CreatorKey      BigInt
+  CreateDT        DateTime          @db.Timestamp(0)
+  UpdaterKey      BigInt
+  UpdateDT        DateTime          @db.Timestamp(0)
+  Province        Province          @relation(fields: [ProvinceKey], references: [ProvinceKey])
+  Project         Project[]
+  ProjectRevision ProjectRevision[]
+  Subdistrict     Subdistrict[]
+}
+
+model EducationLevel {
+  EducationLevelKey BigInt          @id @default(autoincrement())
+  Code              String          @unique(map: "Code_UNIQUE")
+  Name              String
+  ENName            String?
+  Note              String?
+  IsDisabled        Boolean
+  CreatorKey        BigInt
+  CreateDT          DateTime        @db.Timestamp(0)
+  UpdaterKey        BigInt
+  UpdateDT          DateTime        @db.Timestamp(0)
+  UserEducation     UserEducation[]
+}
+
+model FileAttach {
+  FileAttachKey BigInt   @id @default(autoincrement())
+  Name          String
+  MediaTypeKey  BigInt
+  FolderName    String?
+  SubfolderName String?
+  Thumbnail     String?
+  RecordDT      DateTime @db.Timestamp(0)
+  TableName     String?
+  DataKey       String?
+  MimeType      String
+  FileSize      Float    @db.Float4
+  FileGuid      String
+}
+
+model Machine {
+  MachineKey       BigInt             @id @default(autoincrement())
+  Code             String             @unique(map: "Code_UNIQUE")
+  Name             String
+  ENName           String?
+  Note             String?
+  IsDisabled       Boolean
+  CreatorKey       BigInt
+  CreateDT         DateTime           @db.Timestamp(0)
+  UpdaterKey       BigInt
+  UpdateDT         DateTime           @db.Timestamp(0)
+  ProjectDProgMach ProjectDProgMach[]
+}
+
+model Man {
+  ManKey          BigInt            @id @default(autoincrement())
+  Code            String            @unique(map: "Code_UNIQUE")
+  Name            String
+  ENName          String?
+  Note            String?
+  IsDisabled      Boolean
+  CreatorKey      BigInt
+  CreateDT        DateTime          @db.Timestamp(0)
+  UpdaterKey      BigInt
+  UpdateDT        DateTime          @db.Timestamp(0)
+  ProjectDProgMan ProjectDProgMan[]
+}
+
+model Material {
+  MaterialKey         BigInt                @id @default(autoincrement())
+  Code                String                @unique(map: "Code_UNIQUE")
+  Name                String
+  ENName              String?
+  Note                String?
+  Qty                 Decimal               @db.Decimal(10, 5)
+  Unit                String
+  TestQty             Decimal               @db.Decimal(10, 5)
+  TestQtyMin          Decimal?              @db.Decimal(10, 5)
+  TestUnit            String
+  IsDisabled          Boolean
+  CreatorKey          BigInt
+  CreateDT            DateTime              @db.Timestamp(0)
+  UpdaterKey          BigInt
+  UpdateDT            DateTime              @db.Timestamp(0)
+  ProjectMaterial     ProjectMaterial[]
+  ProjectMaterialTest ProjectMaterialTest[]
+}
+
+model Nationality {
+  NationalityKey BigInt   @id @default(autoincrement())
+  Code           String   @unique(map: "Code_UNIQUE")
+  Name           String
+  ENName         String?
+  Note           String?
+  IsDisabled     Boolean
+  CreatorKey     BigInt
+  CreateDT       DateTime @db.Timestamp(0)
+  UpdaterKey     BigInt
+  UpdateDT       DateTime @db.Timestamp(0)
+  User           User[]   @ignore
+}
+
+model News {
+  NewsKey       BigInt   @id @default(autoincrement())
+  NewsTypeKey   BigInt
+  DocDT         DateTime @db.Timestamp(0)
+  Topic         String
+  Detail        String?
+  ImageLocation String?
+  FileLocation  String?
+  RecordDT      DateTime @db.Timestamp(0)
+  RecordUserKey BigInt
+  IsDisabled    Boolean
+  FileName      String?
+  MimeType      String?
+  FileGuid      String?
+}
+
+model Organization {
+  OrganizationKey BigInt   @id @default(autoincrement())
+  Code            String   @unique(map: "Code_UNIQUE")
+  Name            String
+  ENName          String?
+  Note            String?
+  IsDisabled      Boolean
+  CreatorKey      BigInt
+  CreateDT        DateTime @db.Timestamp(0)
+  UpdaterKey      BigInt
+  UpdateDT        DateTime @db.Timestamp(0)
+}
+
+model Position {
+  PositionKey BigInt    @id @default(autoincrement())
+  Code        String    @unique(map: "Code_UNIQUE")
+  Name        String
+  ENName      String?
+  Note        String?
+  IsDisabled  Boolean
+  CreatorKey  BigInt
+  CreateDT    DateTime  @db.Timestamp(0)
+  UpdaterKey  BigInt
+  UpdateDT    DateTime  @db.Timestamp(0)
+  ProvinceKey BigInt?
+  Province    Province? @relation(fields: [ProvinceKey], references: [ProvinceKey])
+  User        User[]    @ignore
+
+  @@index([ProvinceKey], map: "iPositionProvinceKey")
+}
+
+model ProblemCat {
+  ProblemCatKey    BigInt             @id @default(autoincrement())
+  Code             String?            @unique(map: "Code_UNIQUE")
+  Name             String
+  ENName           String?
+  Note             String?
+  IsDisabled       Boolean
+  CreatorKey       BigInt
+  CreateDT         DateTime           @db.Timestamp(0)
+  UpdaterKey       BigInt
+  UpdateDT         DateTime           @db.Timestamp(0)
+  ProjectDProgress ProjectDProgress[]
+  ProjectWProgress ProjectWProgress[]
+}
+
+model ProjCheckDetail {
+  ProjCheckDetailKey                    BigInt             @id @default(autoincrement())
+  ProjCheckTemplateKey                  BigInt
+  OrderNum                              BigInt
+  CheckListKey                          BigInt
+  Name                                  String?
+  ENName                                String?
+  IsDisabled                            Boolean?
+  checkListCheckListKey                 BigInt?
+  projCheckTemplateProjCheckTemplateKey BigInt?
+  CheckList                             CheckList?         @relation(fields: [checkListCheckListKey], references: [CheckListKey])
+  ProjCheckTemplate                     ProjCheckTemplate? @relation(fields: [projCheckTemplateProjCheckTemplateKey], references: [ProjCheckTemplateKey])
+  ProjectChecklist                      ProjectChecklist[]
+
+  @@index([CheckListKey], map: "iProjCheckDetailCheckListKey")
+  @@index([ProjCheckTemplateKey], map: "iProjCheckDetailProjectCheckTemplateKey")
+}
+
+model ProjCheckTemplate {
+  ProjCheckTemplateKey BigInt            @id @default(autoincrement())
+  ProjectTypeKey       BigInt            @unique(map: "ProjectTypeKey_UNIQUE")
+  Code                 String            @unique(map: "Code_UNIQUE")
+  Name                 String
+  ENName               String?
+  Note                 String?
+  IsDisabledForm       Boolean?
+  CreatorKey           BigInt
+  CreateDT             DateTime          @db.Timestamp(0)
+  UpdaterKey           BigInt
+  UpdateDT             DateTime          @db.Timestamp(0)
+  ProjCheckDetail      ProjCheckDetail[]
+}
+
+model Project {
+  ProjectKey             BigInt                 @id @default(autoincrement())
+  Code                   String                 @unique(map: "Code_UNIQUE")
+  Name                   String
+  StartDT                DateTime?              @db.Timestamp(0)
+  EndDT                  DateTime?              @db.Timestamp(0)
+  Note                   String?
+  ProjectSKey            BigInt
+  ContractCode           String?
+  ContractDate           DateTime?              @db.Timestamp(0)
+  ContractorKey          BigInt?
+  ContractorName         String?
+  IsExternalProject      Boolean
+  DepartmentKey          BigInt?
+  OwnerKey               BigInt?
+  OwnerName              String?
+  DesignerNote           String?
+  TotalBudget            Decimal?               @db.Decimal(19, 2)
+  FineAmount             Decimal?               @db.Decimal(19, 2)
+  ProgressNote           String?
+  RecorderKey            BigInt
+  RecordDT               DateTime               @db.Timestamp(0)
+  CompleteEmpKey         BigInt?
+  CompleteDT             DateTime?              @db.Timestamp(0)
+  CompleteNote           String?
+  CancelEmpKey           BigInt?
+  CancelDT               DateTime?              @db.Timestamp(0)
+  CancelNote             String?
+  ProjectTypeKey         BigInt
+  AddressNote            String?
+  SubdistrictKey         BigInt?
+  DistrictKey            BigInt?
+  ProvinceKey            BigInt?
+  Latitude               Float?                 @db.Float4
+  Longtitude             Float?                 @db.Float4
+  ContractPdfFileName    String?
+  DrawingPdfFileName     String?
+  YearKey                BigInt
+  ExternalProjectNote    String?
+  PendingName            String?
+  MainImgFileName        String?
+  OwnerTypeKey           BigInt
+  AdvanceAmount          Decimal?               @db.Decimal(19, 2)
+  BOQPdfFileName         String?
+  PhasePdfFileName       String?
+  ProjectEngineerKey     BigInt?
+  ProjectEngineerNote    String?
+  ProjectEngineerName    String?
+  PercentAdvReim         Decimal?               @db.Decimal(19, 2)
+  AdvanceAmtBalAftReim   Decimal?               @db.Decimal(19, 2)
+  PercentDebAdvance      Decimal?               @db.Decimal(19, 2)
+  RefProjectKey          BigInt?
+  InstallmentPdfFileName String?
+  ProjectPendingTypeKey  BigInt?
+  CommitteeRoleTypeKey   BigInt?
+  Department             Department?            @relation(fields: [DepartmentKey], references: [DepartmentKey])
+  District               District?              @relation(fields: [DistrictKey], references: [DistrictKey])
+  ProjectBudget          ProjectBudget[]
+  ProjectChecklist       ProjectChecklist[]
+  ProjectCommittee       ProjectCommittee[]
+  ProjectDProgress       ProjectDProgress[]
+  ProjectDeliver         ProjectDeliver[]
+  ProjectExtSupervisor   ProjectExtSupervisor[]
+  ProjectImgLocations    ProjectImgLocations[]
+  ProjectMPlan           ProjectMPlan[]
+  ProjectMaterial        ProjectMaterial[]
+  ProjectMaterialTest    ProjectMaterialTest[]
+  ProjectModification    ProjectModification[]
+  ProjectPhase           ProjectPhase[]
+  ProjectSupervisor      ProjectSupervisor[]
+  ProjectTask            ProjectTask[]
+  ProjectUser            ProjectUser?
+  ProjectWProgress       ProjectWProgress[]
+  XReqMessage            XReqMessage[]
+
+  @@index([DepartmentKey], map: "iProjectDepartmentKey")
+  @@index([DistrictKey], map: "iProjectDistrictKey")
+  @@index([SubdistrictKey], map: "iProjectSubdistrictKey")
+  @@index([YearKey], map: "iProjectYearKey")
+}
+
+model ProjectBlackList {
+  ProjectBlackListKey BigInt    @id @default(autoincrement())
+  ProjectKey          BigInt
+  ContractorKey       BigInt
+  IsCondition1True    Boolean?
+  BlackListMessage1   String?
+  IsCondition1BL      Boolean?
+  Condition1Note      String?
+  IsCondition2True    Boolean?
+  BlackListMessage2   String?
+  IsCondition2BL      Boolean?
+  Condition2Note      String?
+  IsCondition3True    Boolean?
+  BlackListMessage3   String?
+  IsCondition3BL      Boolean?
+  Condition3Note      String?
+  IsCondition4True    Boolean?
+  BlackListMessage4   String?
+  IsCondition4BL      Boolean?
+  Condition4Note      String?
+  Note                String?
+  IsBlackListed       Boolean
+  RecorderKey         BigInt
+  RecordDT            DateTime  @db.Timestamp(0)
+  IsCanceled          Boolean?
+  CancelEmpKey        BigInt?
+  CancelDT            DateTime? @db.Timestamp(0)
+  CancelNote          String?
+
+  @@index([ProjectKey], map: "iProjectBlackListProjectKey")
+}
+
+model ProjectBudget {
+  ProjectBudgetKey   BigInt           @id @default(autoincrement())
+  ProjectKey         BigInt
+  FiscalYear         BigInt
+  Budget             Decimal          @db.Decimal(19, 2)
+  Note               String?
+  RecorderKey        BigInt?
+  RecordDT           DateTime?        @db.Timestamp(0)
+  ProjectRevisionKey BigInt?
+  Project            Project          @relation(fields: [ProjectKey], references: [ProjectKey], map: "ProjectBudgetProjectKey")
+  ProjectRevision    ProjectRevision? @relation(fields: [ProjectRevisionKey], references: [ProjectRevisionKey], onDelete: Restrict, map: "ProjectBudgetProjectRevisionKey")
+
+  @@index([ProjectKey], map: "iProjectBudgetProjectKey")
+  @@index([ProjectRevisionKey], map: "iProjectBudgetProjectRevisionKey")
+}
+
+model ProjectChecklist {
+  ProjectChecklistKey BigInt           @id @default(autoincrement())
+  ProjectKey          BigInt
+  ChecklistKey        BigInt
+  LineNum             BigInt?
+  ProjCheckDetailKey  BigInt?
+  EmployeePdfFilename String?
+  DirectorPdfFileName String?
+  ApprovePdfFileName  String?
+  ProjectRevisionKey  BigInt?
+  CheckList           CheckList        @relation(fields: [ChecklistKey], references: [CheckListKey], map: "ProjectChecklistChecklistKey")
+  ProjCheckDetail     ProjCheckDetail? @relation(fields: [ProjCheckDetailKey], references: [ProjCheckDetailKey], onDelete: Restrict, map: "ProjectChecklistProjCheckDetailKey")
+  Project             Project          @relation(fields: [ProjectKey], references: [ProjectKey], map: "ProjectChecklistProjectKey")
+  ProjectRevision     ProjectRevision? @relation(fields: [ProjectRevisionKey], references: [ProjectRevisionKey], onDelete: Restrict, map: "ProjectChecklistProjectRevisionKey")
+
+  @@index([ChecklistKey], map: "iProjectChecklistChecklistKey")
+  @@index([ProjCheckDetailKey], map: "iProjectChecklistProjCheckDetailKey")
+  @@index([ProjectKey], map: "iProjectChecklistProjectKey")
+  @@index([ProjectRevisionKey], map: "iProjectChecklistProjectRevisionKey")
+}
+
+model ProjectCommittee {
+  ProjectCommitteeKey  BigInt    @id @default(autoincrement())
+  ProjectKey           BigInt
+  UserKey              String?
+  LineNum              BigInt
+  CommitteeName        String
+  CommitteeRoleTypeKey BigInt
+  Note                 String?
+  RecorderKey          String?
+  RecordDT             DateTime? @db.Timestamp(0)
+  userkeyint           BigInt?
+  Project              Project   @relation(fields: [ProjectKey], references: [ProjectKey], map: "ProjectCommitteeProjectKey")
+
+  @@index([ProjectKey], map: "iProjectCommitteeProjectKey")
+}
+
+model ProjectDProgDetail {
+  ProjectDProgDetailKey BigInt           @id
+  ProjectDProgressKey   BigInt
+  DetailNote            String
+  AreaNote              String?
+  ResultNote            String?
+  ProjectDProgress      ProjectDProgress @relation(fields: [ProjectDProgressKey], references: [ProjectDProgressKey], map: "ProjectDProgDetailProjectDProgressKey")
+
+  @@index([ProjectDProgressKey], map: "iProjectDProgDetailProjectDProgressKey")
+}
+
+model ProjectDProgImg {
+  ProjectDProgImgKey    BigInt              @id @default(autoincrement())
+  ProjectDProgressKey   BigInt
+  ProjectImgLocationKey BigInt
+  ImageFileName         String?
+  ProjectRevisionKey    BigInt?
+  ProjectDProgress      ProjectDProgress    @relation(fields: [ProjectDProgressKey], references: [ProjectDProgressKey], map: "ProjectDProgImgProjectDProgressKey")
+  ProjectImgLocations   ProjectImgLocations @relation(fields: [ProjectImgLocationKey], references: [ProjectImgLocationsKey], map: "ProjectDProgImgProjectImgLocationKey")
+  ProjectRevision       ProjectRevision?    @relation(fields: [ProjectRevisionKey], references: [ProjectRevisionKey], onDelete: Restrict, map: "ProjectDProgImgProjectRevisionKey")
+
+  @@index([ProjectDProgressKey], map: "iProjectDProgImgProjectDProgressKey")
+  @@index([ProjectImgLocationKey], map: "iProjectDProgImgProjectImgLocationKey")
+  @@index([ProjectRevisionKey], map: "iProjectDProgImgProjectRevisionKey")
+}
+
+model ProjectDProgMach {
+  ProjectDProgMachKey BigInt           @id @default(autoincrement())
+  ProjectDProgressKey BigInt
+  MachineKey          BigInt
+  QtyNote             String
+  ProjectRevisionKey  BigInt?
+  Machine             Machine          @relation(fields: [MachineKey], references: [MachineKey], map: "ProjectDProgMachMachineKey")
+  ProjectDProgress    ProjectDProgress @relation(fields: [ProjectDProgressKey], references: [ProjectDProgressKey], map: "ProjectDProgMachProjectDProgressKey")
+  ProjectRevision     ProjectRevision? @relation(fields: [ProjectRevisionKey], references: [ProjectRevisionKey], onDelete: Restrict, map: "ProjectDProgMachProjectRevisionKey")
+
+  @@index([MachineKey], map: "iProjectDProgMachMachineKey")
+  @@index([ProjectDProgressKey], map: "iProjectDProgMachProjectDProgressKey")
+  @@index([ProjectRevisionKey], map: "iProjectDProgMachProjectRevisionKey")
+}
+
+model ProjectDProgMan {
+  ProjectDProgManKey  BigInt           @id @default(autoincrement())
+  ProjectDProgressKey BigInt
+  ManKey              BigInt
+  QtyNote             String
+  ProjectRevisionKey  BigInt?
+  Man                 Man              @relation(fields: [ManKey], references: [ManKey], map: "ProjectDProgManManKey")
+  ProjectDProgress    ProjectDProgress @relation(fields: [ProjectDProgressKey], references: [ProjectDProgressKey], map: "ProjectDProgManProjectDProgressKey")
+  ProjectRevision     ProjectRevision? @relation(fields: [ProjectRevisionKey], references: [ProjectRevisionKey], onDelete: Restrict, map: "ProjectDProgManProjectRevisionKey")
+
+  @@index([ManKey], map: "iProjectDProgManManKey")
+  @@index([ProjectDProgressKey], map: "iProjectDProgManProjectDProgressKey")
+  @@index([ProjectRevisionKey], map: "iProjectDProgManProjectRevisionKey")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model ProjectDProgTask {
+  ProjectDProgTaskKey BigInt?
+  ProjectDProgressKey BigInt?
+  ProjectTaskKey      BigInt?
+  AccumulateQty       Float?  @db.Float4
+  Note                String?
+  FirstAccumulateQty  Float?  @db.Float4
+  SUM                 Float?  @db.Float4
+  ProjectRevisionKey  BigInt?
+
+  @@ignore
+}
+
+model ProjectDProgress {
+  ProjectDProgressKey BigInt               @id @default(autoincrement())
+  ProjectKey          BigInt
+  RecorderKey         BigInt
+  RecordDT            DateTime             @db.Timestamp(0)
+  PlanPct             Float?               @db.Float4
+  ResultPct           Float?               @db.Float4
+  ResultStatus        String?
+  MorningWeather      BigInt?
+  MorningWaterNote    String?
+  EveningWeather      BigInt?
+  EveningWaterNote    String?
+  NightWeather        BigInt?
+  NightWaterNote      String?
+  ProblemCatKey       BigInt?
+  ProblemNote         String?
+  OperationDetails    String?
+  PdfAttachFileName   String?
+  PdfAttachUserKey    BigInt?
+  PdfAttachDT         DateTime?            @db.Timestamp(0)
+  ProjectRevisionKey  BigInt?
+  ProjectDProgDetail  ProjectDProgDetail[]
+  ProjectDProgImg     ProjectDProgImg[]
+  ProjectDProgMach    ProjectDProgMach[]
+  ProjectDProgMan     ProjectDProgMan[]
+  ProblemCat          ProblemCat?          @relation(fields: [ProblemCatKey], references: [ProblemCatKey], onDelete: Restrict, map: "ProjectDProgressProblemCatKey")
+  Project             Project              @relation(fields: [ProjectKey], references: [ProjectKey], map: "ProjectDProgressProjectKey")
+  ProjectRevision     ProjectRevision?     @relation(fields: [ProjectRevisionKey], references: [ProjectRevisionKey], onDelete: Restrict, map: "ProjectDProgressProjectRevisionKey")
+
+  @@index([ProblemCatKey], map: "iProjectDProgressProblemCatKey")
+  @@index([ProjectKey], map: "iProjectDProgressProjectKey")
+  @@index([ProjectRevisionKey], map: "iProjectDProgressProjectRevisionKey")
+}
+
+model ProjectDeliver {
+  ProjectDeliverKey     BigInt                 @id @default(autoincrement())
+  ProjectKey            BigInt
+  DeliverDT             DateTime               @db.Timestamp(0)
+  RecorderKey           BigInt
+  RecordDT              DateTime               @db.Timestamp(0)
+  Budget                Decimal                @db.Decimal(19, 2)
+  Note                  String?
+  DeliverDocFileName    String?
+  MeetingDocFileName    String?
+  RtnAdvanceAmount      Decimal                @db.Decimal(19, 2)
+  BudgetAfterRtnAdvance String?
+  ProjectRevisionKey    BigInt?
+  Project               Project                @relation(fields: [ProjectKey], references: [ProjectKey], map: "ProjectDeliverProjectKey")
+  ProjectRevision       ProjectRevision?       @relation(fields: [ProjectRevisionKey], references: [ProjectRevisionKey], onDelete: Restrict, map: "ProjectDeliverProjectRevisionKey")
+  ProjectDeliverBudget  ProjectDeliverBudget[]
+  ProjectDeliverPhase   ProjectDeliverPhase[]
+  ProjectPhaseDeliver   ProjectPhaseDeliver[]
+
+  @@index([ProjectKey], map: "iProjectDeliverProjectKey")
+  @@index([ProjectRevisionKey], map: "iProjectDeliverProjectRevisionKey")
+}
+
+model ProjectDeliverBudget {
+  ProjectDeliverBudgetKey BigInt         @id
+  ProjectDeliverKey       BigInt
+  FiscalYear              BigInt
+  Budget                  Decimal        @db.Decimal(19, 2)
+  Note                    String?
+  ProjectDeliver          ProjectDeliver @relation(fields: [ProjectDeliverKey], references: [ProjectDeliverKey], map: "ProjectDeliverBudgetProjectDeliverKey")
+}
+
+model ProjectDeliverPhase {
+  ProjectDeliverPhaseKey BigInt         @id @default(autoincrement())
+  ProjectDeliverKey      BigInt
+  ProjectPhaseKey        BigInt
+  ProjectDeliver         ProjectDeliver @relation(fields: [ProjectDeliverKey], references: [ProjectDeliverKey], map: "ProjectDeliverPhaseProjectDeliverKey")
+  ProjectPhase           ProjectPhase   @relation(fields: [ProjectPhaseKey], references: [ProjectPhaseKey], map: "ProjectDeliverPhaseProjectPhaseKey")
+}
+
+model ProjectExtSupervisor {
+  ProjectExtSupervisorKey BigInt           @id @default(autoincrement())
+  ProjectKey              BigInt
+  LineNum                 BigInt
+  ExtSupervisorName       String
+  SupervisorRoleTypeKey   BigInt
+  Note                    String?
+  ProfessionalIDNumber    String?
+  ProjectRevisionKey      BigInt?
+  Project                 Project          @relation(fields: [ProjectKey], references: [ProjectKey], map: "ProjectExtSupervisorProjectKey")
+  ProjectRevision         ProjectRevision? @relation(fields: [ProjectRevisionKey], references: [ProjectRevisionKey], onDelete: Restrict, map: "ProjectExtSupervisorProjectRevisionKey")
+
+  @@index([ProjectKey], map: "iProjectExtSupervisorProjectKey")
+  @@index([ProjectRevisionKey], map: "iProjectExtSupervisorProjectRevisionKey")
+}
+
+model ProjectImgLocations {
+  ProjectImgLocationsKey BigInt            @id @default(autoincrement())
+  ProjectKey             BigInt
+  ProjectImgCode         String
+  Name                   String
+  ENName                 String?
+  Note                   String?
+  IsDisabled             Boolean
+  ProjectRevisionKey     BigInt?
+  ProjectDProgImg        ProjectDProgImg[]
+  Project                Project           @relation(fields: [ProjectKey], references: [ProjectKey], map: "ProjectImgLocationsProjectKey")
+  ProjectRevision        ProjectRevision?  @relation(fields: [ProjectRevisionKey], references: [ProjectRevisionKey], onDelete: Restrict, map: "ProjectImgLocationsProjectRevisionKey")
+
+  @@index([ProjectKey], map: "iProjectImgLocationsProjectKey")
+  @@index([ProjectRevisionKey], map: "iProjectImgLocationsProjectRevisionKey")
+}
+
+model ProjectMPlan {
+  ProjectMPlanKey    BigInt           @id @default(autoincrement())
+  ProjectKey         BigInt
+  YearKey            BigInt
+  MoyKey             BigInt
+  PlanPct            Decimal          @db.Decimal(9, 2)
+  Note               String?
+  ProjectRevisionKey BigInt?
+  ProjectTaskKey     BigInt?
+  Project            Project          @relation(fields: [ProjectKey], references: [ProjectKey], map: "ProjectMPlanProjectKey")
+  ProjectRevision    ProjectRevision? @relation(fields: [ProjectRevisionKey], references: [ProjectRevisionKey], onDelete: Restrict, map: "ProjectMPlanProjectRevisionKey")
+  ProjectTask        ProjectTask?     @relation(fields: [ProjectTaskKey], references: [ProjectTaskKey], onDelete: Cascade, map: "projectmplan_fk")
+
+  @@index([ProjectKey], map: "iProjectMPlanProjectKey")
+  @@index([ProjectRevisionKey], map: "iProjectMPlanProjectRevisionKey")
+  @@index([YearKey], map: "iProjectMPlanYearKey")
+}
+
+model ProjectMaterial {
+  ProjectMaterialKey BigInt           @id @default(autoincrement())
+  ProjectKey         BigInt
+  ProjectRevisionKey BigInt?
+  RecordUserKey      BigInt
+  RecordDT           DateTime         @db.Timestamp(0)
+  UpdateUserKey      BigInt?
+  UpdateDT           DateTime?        @db.Timestamp(0)
+  MaterialKey        BigInt
+  Qty                Decimal          @db.Decimal(10, 5)
+  Unit               String
+  TestQty            Decimal          @db.Decimal(10, 5)
+  TestUnit           String
+  Note               String?
+  Material           Material         @relation(fields: [MaterialKey], references: [MaterialKey], map: "ProjectMaterialMaterialKey")
+  Project            Project          @relation(fields: [ProjectKey], references: [ProjectKey], map: "ProjectMaterialProjectKey")
+  ProjectRevision    ProjectRevision? @relation(fields: [ProjectRevisionKey], references: [ProjectRevisionKey], onDelete: Restrict, map: "ProjectRevisionProjectKey")
+}
+
+model ProjectMaterialTest {
+  ProjectMaterialTestKey BigInt           @id @default(autoincrement())
+  ProjectKey             BigInt
+  ProjectRevisionKey     BigInt?
+  MaterialKey            BigInt
+  TestQty                Decimal          @db.Decimal(10, 5)
+  FileUrl                String
+  Note                   String?
+  RecordUserKey          BigInt
+  RecordDT               DateTime         @db.Timestamp(0)
+  UpdateUserKey          BigInt?
+  UpdateDT               DateTime?        @db.Timestamp(0)
+  Material               Material         @relation(fields: [MaterialKey], references: [MaterialKey], map: "ProjectMaterialTestMaterialKey")
+  Project                Project          @relation(fields: [ProjectKey], references: [ProjectKey], map: "ProjectMaterialTestProjectKey")
+  ProjectRevision        ProjectRevision? @relation(fields: [ProjectRevisionKey], references: [ProjectRevisionKey], onDelete: Restrict, map: "ProjectMaterialTestProjectRevisionKey")
+}
+
+model ProjectModification {
+  ProjectModificationKey BigInt           @id @default(autoincrement())
+  ProjectKey             BigInt
+  LineNum                BigInt
+  ReviseDT               DateTime         @db.Timestamp(0)
+  ReviseNote             String
+  Note                   String?
+  ProjectRevisionKey     BigInt?
+  Project                Project          @relation(fields: [ProjectKey], references: [ProjectKey], map: "ProjectModificationProjectKey")
+  ProjectRevision        ProjectRevision? @relation(fields: [ProjectRevisionKey], references: [ProjectRevisionKey], onDelete: Restrict, map: "ProjectModificationProjectRevisionKey")
+
+  @@index([ProjectKey], map: "iProjectModificationProjectKey")
+  @@index([ProjectRevisionKey], map: "iProjectModificationProjectRevisionKey")
+}
+
+model ProjectPhase {
+  ProjectPhaseKey     BigInt                @id @default(autoincrement())
+  ProjectKey          BigInt
+  PhaseNumber         String
+  IsDelivered         Boolean
+  FromDate            String?
+  ToDate              String?
+  Budget              Decimal?              @db.Decimal(19, 2)
+  Note                String?
+  WorkDetail          String?
+  RecorderKey         BigInt?
+  RecordDT            DateTime?             @db.Timestamp(0)
+  ProjectRevisionKey  BigInt?
+  ProjectDeliverPhase ProjectDeliverPhase[]
+  Project             Project               @relation(fields: [ProjectKey], references: [ProjectKey], map: "ProjectPhaseProjectKey")
+  ProjectRevision     ProjectRevision?      @relation(fields: [ProjectRevisionKey], references: [ProjectRevisionKey], onDelete: Restrict, map: "ProjectPhaseProjectRevisionKey")
+  ProjectPhaseDeliver ProjectPhaseDeliver[]
+
+  @@index([ProjectKey], map: "iProjectPhaseProjectKey")
+  @@index([ProjectRevisionKey], map: "iProjectPhaseProjectRevisionKey")
+}
+
+model ProjectPhaseDeliver {
+  ProjectPhaseDeliverKey BigInt           @id @default(autoincrement())
+  ProjectPhaseKey        BigInt
+  ProjectDeliverKey      BigInt
+  ProjectRevisionKey     BigInt?
+  ProjectDeliver         ProjectDeliver   @relation(fields: [ProjectDeliverKey], references: [ProjectDeliverKey], map: "ProjectPhaseDeliverProjectDeliverKey")
+  ProjectPhase           ProjectPhase     @relation(fields: [ProjectPhaseKey], references: [ProjectPhaseKey], map: "ProjectPhaseDeliverProjectPhaseKey")
+  ProjectRevision        ProjectRevision? @relation(fields: [ProjectRevisionKey], references: [ProjectRevisionKey], onDelete: Restrict, map: "ProjectPhaseDeliverProjectRevisionKey")
+
+  @@index([ProjectDeliverKey], map: "iProjectPhaseDeliverProjectDeliverKey")
+  @@index([ProjectPhaseKey], map: "iProjectPhaseDeliverProjectPhaseKey")
+  @@index([ProjectRevisionKey], map: "iProjectPhaseDeliverProjectRevisionKey")
+}
+
+model ProjectRevision {
+  ProjectRevisionKey     BigInt                 @id @default(autoincrement())
+  ProjectKey             BigInt
+  Code                   String                 @unique(map: "Code_UNIQUE")
+  Name                   String
+  StartDT                DateTime?              @db.Timestamp(0)
+  EndDT                  DateTime?              @db.Timestamp(0)
+  Note                   String?
+  ProjectSKey            BigInt
+  ContractCode           String?
+  ContractDate           DateTime?              @db.Timestamp(0)
+  ContractorKey          BigInt?
+  ContractorName         String?
+  IsExternalProject      Boolean
+  DepartmentKey          BigInt?
+  OwnerKey               BigInt?
+  OwnerName              String?
+  DesignerNote           String?
+  TotalBudget            Decimal?               @db.Decimal(19, 2)
+  FineAmount             Decimal?               @db.Decimal(19, 2)
+  ProgressNote           String?
+  RecorderKey            BigInt
+  RecordDT               DateTime               @db.Timestamp(0)
+  CompleteEmpKey         BigInt?
+  CompleteDT             DateTime?              @db.Timestamp(0)
+  CompleteNote           String?
+  CancelEmpKey           BigInt?
+  CancelDT               DateTime?              @db.Timestamp(0)
+  CancelNote             String?
+  ProjectTypeKey         BigInt
+  AddressNote            String?
+  SubdistrictKey         BigInt?
+  DistrictKey            BigInt?
+  ProvinceKey            BigInt?
+  Latitude               Float?                 @db.Float4
+  Longtitude             Float?                 @db.Float4
+  ContractPdfFileName    String?
+  DrawingPdfFileName     String?
+  YearKey                BigInt
+  ExternalProjectNote    String?
+  PendingName            String?
+  MainImgFileName        String?
+  ProjectEngineerKey     BigInt?
+  ProjectEngineerNote    String?
+  ProjectEngineerName    String?
+  BOQPdfFileName         String?
+  InstallmentPdfFileName String?
+  ProjectPendingTypeKey  BigInt?
+  CommitteeRoleTypeKey   BigInt?
+  OwnerTypeKey           BigInt
+  AdvanceAmount          Decimal?               @db.Decimal(19, 2)
+  PhasePdfFileName       String?
+  PercentAdvReim         Decimal?               @db.Decimal(19, 2)
+  AdvanceAmtBalAftReim   Decimal?               @db.Decimal(19, 2)
+  PercentDebAdvance      Decimal?               @db.Decimal(19, 2)
+  RefProjectKey          BigInt?
+  RevisionDT             DateTime?              @db.Timestamp(0)
+  ProjectBudget          ProjectBudget[]
+  ProjectChecklist       ProjectChecklist[]
+  ProjectDProgImg        ProjectDProgImg[]
+  ProjectDProgMach       ProjectDProgMach[]
+  ProjectDProgMan        ProjectDProgMan[]
+  ProjectDProgress       ProjectDProgress[]
+  ProjectDeliver         ProjectDeliver[]
+  ProjectExtSupervisor   ProjectExtSupervisor[]
+  ProjectImgLocations    ProjectImgLocations[]
+  ProjectMPlan           ProjectMPlan[]
+  ProjectMaterial        ProjectMaterial[]
+  ProjectMaterialTest    ProjectMaterialTest[]
+  ProjectModification    ProjectModification[]
+  ProjectPhase           ProjectPhase[]
+  ProjectPhaseDeliver    ProjectPhaseDeliver[]
+  Department             Department?            @relation(fields: [DepartmentKey], references: [DepartmentKey], onDelete: Restrict, map: "ProjectRevisionDepartmentKey")
+  District               District?              @relation(fields: [DistrictKey], references: [DistrictKey], onDelete: Restrict, map: "ProjectRevisionDistrictKey")
+  Subdistrict            Subdistrict?           @relation(fields: [SubdistrictKey], references: [SubdistrictKey], onDelete: Restrict, map: "ProjectRevisionSubdistrictKey")
+  ProjectTask            ProjectTask[]
+  ProjectWProgress       ProjectWProgress[]
+
+  @@index([DepartmentKey], map: "iProjectRevisionDepartmentKey")
+  @@index([DistrictKey], map: "iProjectRevisionDistrictKey")
+  @@index([SubdistrictKey], map: "iProjectRevisionSubdistrictKey")
+  @@index([YearKey], map: "iProjectRevisionYearKey")
+}
+
+model ProjectSupervisor {
+  ProjectSupervisorKey  BigInt  @id @default(autoincrement())
+  ProjectKey            BigInt
+  UserKey               String?
+  LineNum               BigInt
+  SupervisorName        String
+  SupervisorRoleTypeKey BigInt
+  Note                  String?
+  IsReporter            Boolean
+  Project               Project @relation(fields: [ProjectKey], references: [ProjectKey], map: "ProjectSupervisorProjectKey")
+
+  @@index([ProjectKey], map: "iProjectSupervisorProjectKey")
+}
+
+model ProjectTask {
+  ProjectTaskKey     BigInt           @id @default(autoincrement())
+  ParentTaskKey      BigInt?
+  ProjectKey         BigInt
+  TaskCode           String
+  Name               String
+  Budget             Decimal          @db.Decimal(19, 2)
+  WeightPct          Decimal          @db.Decimal(9, 4)
+  Qty                Decimal          @db.Decimal(9, 2)
+  UnitName           String
+  FromDate           DateTime?        @db.Timestamp(6)
+  ToDate             DateTime?        @db.Timestamp(6)
+  ProjectRevisionKey BigInt?
+  ProjectMPlan       ProjectMPlan[]
+  Project            Project          @relation(fields: [ProjectKey], references: [ProjectKey], map: "ProjectTaskProjectKey")
+  ProjectRevision    ProjectRevision? @relation(fields: [ProjectRevisionKey], references: [ProjectRevisionKey], onDelete: Restrict, map: "ProjectTaskProjectRevisionKey")
+
+  @@index([ProjectKey], map: "iProjectTaskProjectKey")
+  @@index([ProjectRevisionKey], map: "iProjectTaskProjectRevisionKey")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model ProjectTaskMPlan {
+  ProjectTaskKey     BigInt
+  ParentTaskKey      BigInt?
+  ProjectKey         BigInt
+  TaskCode           String
+  Name               String
+  Budget             Decimal   @db.Decimal(19, 2)
+  WeightPct          Decimal   @db.Decimal(9, 4)
+  Qty                Decimal   @db.Decimal(9, 2)
+  UnitName           String
+  FromDate           DateTime? @db.Timestamp(6)
+  ToDate             DateTime? @db.Timestamp(6)
+  ProjectMPlanKey    BigInt
+  YearKey            BigInt
+  MoyKey             BigInt
+  PlanPct            Decimal   @db.Decimal(9, 2)
+  Note               String?
+  ProjectRevisionKey BigInt?
+
+  @@ignore
+}
+
+model ProjectUser {
+  ProjectUserKey     BigInt  @id @default(autoincrement())
+  ProjectKey         BigInt  @unique(map: "ProjectKey_UNIQUE")
+  UserKey            BigInt  @unique(map: "UserKey_UNIQUE")
+  ProjectRoleTypeKey BigInt
+  Note               String?
+  Project            Project @relation(fields: [ProjectKey], references: [ProjectKey], map: "ProjectUserProjectKey")
+}
+
+model ProjectWProgress {
+  ProjectWProgressKey BigInt           @id @default(autoincrement())
+  ProjectKey          BigInt
+  RecorderKey         BigInt
+  RecordDT            DateTime         @db.Timestamp(0)
+  YearKey             BigInt
+  MoyKey              BigInt
+  WIntervalKey        BigInt
+  PlanPct             Decimal          @db.Decimal(9, 2)
+  ResultPct           Decimal          @db.Decimal(9, 2)
+  ProblemNote         String?
+  ProblemCatKey       BigInt?
+  PdfAttachFileName   String?
+  PdfAttachUserKey    BigInt?
+  PdfAttachDT         DateTime?        @db.Timestamp(0)
+  ProjectRevisionKey  BigInt?
+  Project             Project          @relation(fields: [ProjectKey], references: [ProjectKey], map: "ProjectWProgressProjectKey")
+  ProjectRevision     ProjectRevision? @relation(fields: [ProjectRevisionKey], references: [ProjectRevisionKey], onDelete: Restrict, map: "ProjectWProgressProjectRevisionKey")
+  WInterval           WInterval        @relation(fields: [WIntervalKey], references: [WIntervalKey], map: "ProjectWProgressWIntervalKey")
+  ProblemCat          ProblemCat?      @relation(fields: [ProblemCatKey], references: [ProblemCatKey], map: "ProjectWProgress_ProblemCat_fkey")
+
+  @@index([ProjectKey], map: "iProjectWProgressProjectKey")
+  @@index([WIntervalKey], map: "iProjectWProgressWIntervalKey")
+  @@index([YearKey], map: "iProjectWProgressYearKey")
+  @@index([ProjectRevisionKey], map: "iProjectWProgress_ProjectRevisionKey")
+}
+
+model Province {
+  ProvinceKey      BigInt         @id @unique @default(autoincrement())
+  Code             String         @unique(map: "Code_UNIQUE")
+  Name             String
+  ENName           String
+  Note             String?
+  IsDisabled       Boolean
+  CreatorKey       BigInt
+  CreateDT         DateTime       @db.Timestamp(0)
+  UpdaterKey       BigInt
+  UpdateDT         DateTime       @db.Timestamp(0)
+  ProvinceGroupKey BigInt?
+  District         District[]
+  Position         Position[]
+  ProvinceGroup    ProvinceGroup? @relation(fields: [ProvinceGroupKey], references: [ProvinceGroupKey], onDelete: Restrict, map: "ProvinceGroupKey")
+
+  @@index([ProvinceGroupKey], map: "iProvinceGroupKey")
+}
+
+model ProvinceGroup {
+  ProvinceGroupKey BigInt     @id
+  Code             String     @unique(map: "Code_UNIQUE")
+  Name             String
+  ENName           String?
+  Note             String?
+  IsDisabled       Boolean
+  CreatorKey       BigInt
+  CreateDT         DateTime   @db.Timestamp(0)
+  UpdaterKey       BigInt
+  UpdateDT         DateTime   @db.Timestamp(0)
+  Province         Province[]
+
+  @@index([CreatorKey], map: "iCreatorKey_idx")
+  @@index([UpdaterKey], map: "iUpdaterKey_idx")
+}
+
+model Race {
+  RaceKey    BigInt   @id @default(autoincrement())
+  Code       String   @unique(map: "Code_UNIQUE")
+  Name       String?
+  ENName     String?
+  Note       String?
+  IsDisabled Boolean
+  CreatorKey BigInt
+  CreateDT   DateTime @db.Timestamp(0)
+  UpdaterKey BigInt
+  UpdateDT   DateTime @db.Timestamp(0)
+  User       User[]   @ignore
+}
+
+model ReferenceX {
+  ReferenceKey  BigInt
+  EnumClassName String
+  EnumItemName  String
+  LineNum       BigInt
+  ENUSText      String
+  THTHText      String
+  Icon          String?
+
+  @@id([ReferenceKey, EnumClassName])
+  @@index([EnumClassName], map: "index_status")
+}
+
+model Religion {
+  ReligionKey BigInt   @id @default(autoincrement())
+  Code        String   @unique(map: "Code_UNIQUE")
+  Name        String
+  ENName      String?
+  Note        String?
+  IsDisabled  Boolean
+  CreatorKey  BigInt
+  CreateDT    DateTime @db.Timestamp(0)
+  UpdaterKey  BigInt
+  UpdateDT    DateTime @db.Timestamp(0)
+  User        User[]   @ignore
+}
+
+model Role {
+  RoleKey        BigInt           @id @default(autoincrement())
+  OrderNo        BigInt
+  Name           String           @unique(map: "Name_UNIQUE")
+  Note           String?
+  IsActive       Boolean
+  IsSystem       Boolean
+  RoleMember     RoleMember[]
+  RolePermission RolePermission[]
+}
+
+model RoleMember {
+  RoleKey  BigInt
+  UserKey  BigInt
+  IsSystem Boolean
+  Role     Role    @relation(fields: [RoleKey], references: [RoleKey], map: "RoleMemberRoleKey")
+
+  @@id([RoleKey, UserKey])
+}
+
+model RolePermission {
+  RoleKey      BigInt
+  SecurableKey BigInt
+  IsSystem     Boolean
+  Role         Role      @relation(fields: [RoleKey], references: [RoleKey], map: "RolePermissionRoleKey")
+  Securable    Securable @relation(fields: [SecurableKey], references: [SecurableKey], map: "RolePermissionSecurableKey")
+
+  @@id([RoleKey, SecurableKey])
+  @@index([SecurableKey], map: "iRolePermissionSecurableKey")
+}
+
+model School {
+  SchoolKey     BigInt          @id @default(autoincrement())
+  Code          String          @unique(map: "Code_UNIQUE")
+  Name          String
+  ENName        String?
+  Note          String?
+  IsDisabled    Boolean
+  CreatorKey    BigInt
+  CreateDT      DateTime        @db.Timestamp(0)
+  UpdaterKey    BigInt
+  UpdateDT      DateTime        @db.Timestamp(0)
+  UserEducation UserEducation[]
+}
+
+model Securable {
+  SecurableKey                                   BigInt           @id
+  SecurableType                                  BigInt
+  OrderNo                                        BigInt
+  Name                                           String
+  Signature                                      String           @unique(map: "Signature_UNIQUE")
+  Data                                           String?
+  IsExcluded                                     Boolean
+  IsActive                                       Boolean
+  ParentKey                                      BigInt?
+  RootKey                                        BigInt?
+  ImageFileName                                  String?
+  RolePermission                                 RolePermission[]
+  Securable_Securable_ParentKeyToSecurable       Securable?       @relation("Securable_ParentKeyToSecurable", fields: [ParentKey], references: [SecurableKey])
+  other_Securable_Securable_ParentKeyToSecurable Securable[]      @relation("Securable_ParentKeyToSecurable")
+  Securable_Securable_RootKeyToSecurable         Securable?       @relation("Securable_RootKeyToSecurable", fields: [RootKey], references: [SecurableKey])
+  other_Securable_Securable_RootKeyToSecurable   Securable[]      @relation("Securable_RootKeyToSecurable")
+}
+
+model Sequence {
+  SequenceKey    BigInt           @id
+  TableName      String           @unique(map: "TableName_UNIQUE")
+  ColumnName     String
+  PeriodPattern  BigInt
+  Len            BigInt
+  PrefixPattern  String?
+  SuffixPattern  String?
+  Note           String?
+  SequencePeriod SequencePeriod[]
+}
+
+model SequencePeriod {
+  SequencePeriodKey BigInt   @id @default(autoincrement())
+  SequenceKey       BigInt
+  Name              String
+  NextNumber        BigInt
+  Len               BigInt
+  Prefix            String?
+  Suffix            String?
+  FromDate          DateTime @db.Timestamp(0)
+  ToDate            DateTime @db.Timestamp(0)
+  Sequence          Sequence @relation(fields: [SequenceKey], references: [SequenceKey], map: "SequencePeriodSequenceKey")
+
+  @@index([SequenceKey], map: "iSequencePeriodSequenceKey")
+}
+
+model Subdistrict {
+  SubdistrictKey  BigInt            @id @default(autoincrement())
+  DistrictKey     BigInt
+  Code            String
+  Name            String
+  ENName          String
+  Note            String?
+  ZipCode         String?
+  IsDisabled      Boolean
+  CreatorKey      BigInt
+  CreateDT        DateTime          @db.Timestamp(0)
+  UpdaterKey      BigInt
+  UpdateDT        DateTime          @db.Timestamp(0)
+  ProjectRevision ProjectRevision[]
+  District        District          @relation(fields: [DistrictKey], references: [DistrictKey], map: "DistrictKey")
+
+  @@index([DistrictKey], map: "iDistrictKey")
+}
+
+model SupervisorGroup {
+  SupervisorGroupKey BigInt   @id
+  Code               String   @unique(map: "Code_UNIQUE")
+  Name               String
+  ENName             String?
+  Note               String?
+  IsDisabled         Boolean
+  CreatorKey         BigInt
+  CreateDT           DateTime @db.Timestamp(0)
+  UpdaterKey         BigInt
+  UpdateDT           DateTime @db.Timestamp(0)
+  User               User[]   @ignore
+}
+
+model TaskScheduler {
+  TaskSchedulerKey BigInt    @id
+  ServiceName      String
+  LastRunTime      DateTime? @db.Timestamp(0)
+}
+
+model Title {
+  TitleKey   BigInt   @id @default(autoincrement())
+  Code       String   @unique(map: "Code_UNIQUE")
+  Name       String
+  ENName     String?
+  Note       String?
+  IsDisabled Boolean
+  CreatorKey BigInt
+  CreateDT   DateTime @db.Timestamp(0)
+  UpdaterKey BigInt
+  UpdateDT   DateTime @db.Timestamp(0)
+  User       User[]   @ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model User {
+  UserKey              BigInt
+  UserTypeKey          BigInt
+  UserSKey             BigInt
+  LoginName            String
+  Password             String
+  LastLoginDT          DateTime         @db.Timestamp(6)
+  Code                 String
+  TitleKey             BigInt?
+  FirstName            String
+  LastName             String?
+  PositionKey          BigInt?
+  DepartmentKey        BigInt?
+  Email                String?
+  Phone                String?
+  Fax                  String?
+  UserStatusNote       String?
+  ReportToUserKey      BigInt?
+  ImageFileName        String?
+  Cid                  String?
+  BirthDate            String?
+  RaceKey              BigInt?
+  NationalityKey       BigInt?
+  ReligionKey          BigInt?
+  BloodGroupKey        BigInt?
+  IllnessNote          String?
+  IllnessMedicNote     String?
+  ProfessionalIDNumber String?
+  EmployeeTypeKey      BigInt
+  SuperVisorTypeKey    BigInt
+  WorkStartDate        String?
+  SignatureFileName    String?
+  SupervisorGroupKey   BigInt?
+  UserId               String?
+  BloodGroup           BloodGroup?      @relation(fields: [BloodGroupKey], references: [BloodGroupKey], map: "User_BloodGroup_fkey")
+  Department           Department?      @relation(fields: [DepartmentKey], references: [DepartmentKey], map: "User_Department_fkey")
+  Nationality          Nationality?     @relation(fields: [NationalityKey], references: [NationalityKey], map: "User_Nationality_fkey")
+  Position             Position?        @relation(fields: [PositionKey], references: [PositionKey], map: "User_Position_fkey")
+  Race                 Race?            @relation(fields: [RaceKey], references: [RaceKey], map: "User_Race_fkey")
+  Religion             Religion?        @relation(fields: [ReligionKey], references: [ReligionKey], map: "User_Religion_fkey")
+  SupervisorGroup      SupervisorGroup? @relation(fields: [SupervisorGroupKey], references: [SupervisorGroupKey], map: "User_SupervisorGroup_fkey")
+  Title                Title?           @relation(fields: [TitleKey], references: [TitleKey], map: "User_Title_fkey")
+
+  @@ignore
+}
+
+model UserEducation {
+  UserEducationKey  BigInt         @id @default(autoincrement())
+  UserKey           BigInt
+  EducationLevelKey BigInt
+  SchoolKey         BigInt?
+  MajorNote         String?
+  GraduateYear      BigInt?
+  EducationLevel    EducationLevel @relation(fields: [EducationLevelKey], references: [EducationLevelKey], map: "UserEducationEducationLevelKey")
+  School            School?        @relation(fields: [SchoolKey], references: [SchoolKey], onDelete: Restrict, map: "UserEducationSchoolKey")
+
+  @@index([EducationLevelKey], map: "iUserEducationEducationLevelKey")
+  @@index([SchoolKey], map: "iUserEducationSchoolKey")
+}
+
+model WInterval {
+  WIntervalKey     BigInt             @id @default(autoincrement())
+  Code             String             @unique(map: "Code_UNIQUE")
+  Name             String
+  ENName           String?
+  FromDateNumber   BigInt
+  ToDateNumber     BigInt
+  Note             String?
+  IsDisabled       Boolean
+  CreatorKey       BigInt
+  CreateDT         DateTime           @db.Timestamp(0)
+  UpdaterKey       BigInt
+  UpdateDT         DateTime           @db.Timestamp(0)
+  ProjectWProgress ProjectWProgress[]
+}
+
+model XReqMessage {
+  XReqMessageKey BigInt   @id @unique
+  ProjectKey     BigInt
+  MessageDT      DateTime @db.Timestamp(0)
+  IsRead         Boolean
+  RecorderKey    BigInt
+  RecordDT       DateTime @db.Timestamp(0)
+  MessageNote    String
+  Project        Project  @relation(fields: [ProjectKey], references: [ProjectKey], map: "XReqMessageProjectKey")
+
+  @@index([ProjectKey], map: "iXReqMessageProjectKey")
+}
+
+model Year {
+  YearKey   BigInt @id @default(autoincrement())
+  YearName  String @unique(map: "YearName_UNIQUE") @db.Char(4)
+  YearValue BigInt @unique(map: "YearValue_UNIQUE")
+}
+
+model userfiles__user_upload_files {
+  filename                       String                           @id
+  file_id                        String                           @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  file_size                      BigInt
+  username                       String
+  upload_time                    DateTime?                        @default(now()) @db.Timestamp(6)
+  userfiles__user_upload_payload userfiles__user_upload_payload[]
+
+  @@map("userfiles_$user_upload_files")
+}
+
+model userfiles__user_upload_payload {
+  file_id                      String                       @db.Uuid
+  byte_offset                  BigInt
+  payload                      Bytes?
+  userfiles__user_upload_files userfiles__user_upload_files @relation(fields: [file_id], references: [file_id], onDelete: NoAction, onUpdate: NoAction, map: "file_id_fk")
+
+  @@id([file_id, byte_offset])
+  @@map("userfiles_$user_upload_payload")
+}
+
+model userfiles_kritsana_pr_41_gmail_upload_files {
+  filename    String    @id
+  file_id     String    @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  file_size   BigInt
+  username    String
+  upload_time DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model userfiles_kritsana_pr_41_gmail_upload_payload {
+  file_id     String @db.Uuid
+  byte_offset BigInt
+  payload     Bytes?
+
+  @@id([file_id, byte_offset])
 }
