@@ -5,7 +5,9 @@
   "scripts": {
     "dev:server": "nx serve server",
     "dev:client": "nx serve client",
-    "dev": "concurrently \"npm run dev:server\" && sleep 3 && \"npm run dev:client\""
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build:server": "nx build server",
+    "build:client": "nx build client"
   },
   "private": true,
   "devDependencies": {
